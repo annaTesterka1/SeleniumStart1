@@ -7,14 +7,16 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.Assert;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeTest;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
+import org.testng.annotations.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -22,18 +24,55 @@ import java.util.concurrent.TimeUnit;
 public class mojPierwszyTest {
     WebDriver driver;
 
-    @BeforeTest
-    public void setUp() {
-        System.setProperty("webdriver.chrome.driver", "c:\\pliki\\chromedriver.exe");
+
+    @BeforeMethod //metoda uruchamiana przed Pierwsza metodą typu test
+    @Parameters({ "seleniumHost", "seleniumPort", "browser", "url" })
+    public void setUp(String seleniumHost, int seleniumPort, String browser, String url)
+            throws MalformedURLException {
+//    @BeforeTest
+//    public void setUp() throws MalformedURLException {
+//        System.setProperty("webdriver.chrome.driver", "c:\\pliki\\chromedriver.exe");
 //        System.setProperty("webdriver.gecko.driver", "c:\\pliki\\geckodriver.exe");
 //        System.setProperty("webdriver.ie.driver", "c:\\pliki\\IEDriverServer.exe");
 //        System.setProperty("webdriver.edge.driver", "c:\\pliki\\MicrosoftWebDriver.exe");
-        driver = new ChromeDriver();
+//        driver = new ChromeDriver();
+//        DesiredCapabilities chromeCaps = DesiredCapabilities.chrome();
+//        chromeCaps.setCapability(CapabilityType.BROWSER_NAME, "chrome");
+//        chromeCaps.setCapability(CapabilityType.VERSION, "59.w10");
+//        chromeCaps.setCapability(CapabilityType.PLATFORM, "WIN10");
+//
+//
+//        driver = new RemoteWebDriver(new URL("http://212.106.131.201:4444/wd/hub"), chromeCaps);
+//
+            if (browser.equals("firefox")){
+                System.setProperty("webdriver.gecko.driver", "c:\\pliki\\geckodriver.exe");
+                DesiredCapabilities ffCaps = DesiredCapabilities.firefox();
+                ffCaps.setCapability(CapabilityType.BROWSER_NAME, browser);
+                driver = new RemoteWebDriver
+                        (new URL("http://"+seleniumHost+":"+seleniumPort+"/wd/hub"),ffCaps);
+            } else if (browser.equals("chrome")){
+                System.setProperty("webdriver.chrome.driver", "c:\\pliki\\chromedriver.exe");
+                DesiredCapabilities chromeCaps = DesiredCapabilities.chrome();
+                chromeCaps.setCapability(CapabilityType.BROWSER_NAME, "chrome");
+                driver = new RemoteWebDriver
+                        (new URL("http://"+seleniumHost+":"+seleniumPort+"/wd/hub"),chromeCaps);
+            } else if (browser.equals("edge")) {
+                System.setProperty("webdriver.edge.driver", "c:\\pliki\\MicrosoftWebDriver.exe");
+                DesiredCapabilities edgeCaps = DesiredCapabilities.edge();
+                edgeCaps.setCapability(CapabilityType.BROWSER_NAME, "MicrosoftEdge");
+                driver = new RemoteWebDriver(
+                        new URL("http://"+seleniumHost+":"+seleniumPort+"/wd/hub"),edgeCaps);
+            }
+            driver.navigate().to(url);
+            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
+
+
 //        driver = new FirefoxDriver();
 //        driver = new InternetExplorerDriver();
 //        driver = new EdgeDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.get("http://helion.pl");
+//        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+//        driver.get("http://helion.pl");
     }
 
     @AfterTest
@@ -43,7 +82,7 @@ public class mojPierwszyTest {
 
     @Test
     public void startWebdriver() {
-        Assert.assertFalse((driver.getTitle().contains("Helionfgfg")), "tytul jest niewlasciwy");
+        Assert.assertFalse((driver.getTitle().contains("Helionjhh")), "tytul jest niewlasciwy");
     }
 
     @Test
